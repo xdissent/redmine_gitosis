@@ -140,7 +140,7 @@ module Gitosis
 					f.puts "git config user.email '#{Setting.mail_from}'"
 					f.puts "git config user.name 'Redmine'"
 					f.puts "git commit -a -m 'updated by Redmine Gitosis'"
-					f.puts "git push"
+					f.puts "GIT_SSH=#{ssh_with_identity_file} git push"
 				end
 				File.chmod(0755, git_push_file)
 
