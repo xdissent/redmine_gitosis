@@ -72,12 +72,22 @@ module Gitosis
 			# HANDLE GIT
 
 			# create tmp dir
-			local_dir = File.join(RAILS_ROOT,"tmp","redmine_gitosis_#{Time.now.to_i}")
+			local_dir = File.join("/tmp","redmine_gitosis_#{Time.now.to_i}")
 
 			Dir.mkdir local_dir
 
 			# clone repo
 			`git clone #{Setting.plugin_redmine_gitosis['gitosisUrl']} #{local_dir}/gitosis`
+            ssh_with_identity_file = File.join(local_dir, 'ssh_with_identity_file.sh')
+
+			File.open(ssh_with_identity_file, "w") do |f|
+				f.puts "#!/bin/bash"
+				f.puts "exec ssh -o stricthostkeychecking=no -i #{Setting.plugin_redmine_gitosis['gitosisIdentityFile']} \"$@\""
+			end
+			File.chmod(0755, ssh_with_identity_file)
+
+			# clone repo
+			`env GIT_SSH=#{ssh_with_identity_file} git clone #{Setting.plugin_redmine_gitosis['gitosisUrl']} #{local_dir}/gitosis`
 
 			changed = false
 			projects.select{|p| p.repository.is_a?(Repository::Git)}.each do |project|
@@ -120,11 +130,11 @@ module Gitosis
 
 			end
 			if changed
-				git_push_file = File.join(local_dir, 'git_push.bat')
+				git_push_file = File.join(local_dir, 'git_push.sh')
 
-	      new_dir= File.join(local_dir,'gitosis')
-				new_dir.gsub!(/\//, '\\')
+                new_dir= File.join(local_dir,'gitosis')
 				File.open(git_push_file, "w") do |f|
+				    f.puts "#!/bin/sh"
 					f.puts "cd #{new_dir}"
 					f.puts "git add keydir/* gitosis.conf"
 					f.puts "git config user.email '#{Setting.mail_from}'"
