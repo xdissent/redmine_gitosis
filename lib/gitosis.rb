@@ -4,7 +4,7 @@ require 'net/ssh'
 require 'tmpdir'
 
 module Gitosis
-  def self.renderReadOnlyUrls(baseUrlStr, projectId,parent)
+  def self.renderReadOnlyUrls(baseUrlStr, projectId)
     rendered = ""
     if (baseUrlStr.length == 0)
       return rendered
@@ -18,35 +18,14 @@ module Gitosis
     rendered = rendered + "<strong>Read Only Url:</strong><br />"
     rendered = rendered + "<ul>"
     
-    rendered = rendered + "<li>" + baseUrlList[0] +(parent ? "" : "/"+parent+"/")+ projectId + baseUrlList[1] + "</li>"
+    rendered = rendered + "<li>" + baseUrlList[0] + projectId + baseUrlList[1] + "</li>"
     
     rendered = rendered + "</ul>\n"
     
     return rendered
   end
-
-        def self.renderUrls(baseUrlStr, projectId, isReadOnly)
-                rendered = ""
-                if(baseUrlStr.length == 0)
-                        return rendered
-                end
-                baseUrlList=baseUrlStr.split(/[\r\n\t ,;]+/)
-
-                if(not defined?(baseUrlList.length))
-                        return rendered
-                end
-
-
-                rendered = rendered + "<strong>" + (isReadOnly ? "Read Only" : "Developer") + " " + (baseUrlList.length == 1 ? "URL" : "URLs") + ": </strong><br/>"
-                                rendered = rendered + "<ul>";
-                                for baseUrl in baseUrlList do
-                                                rendered = rendered + "<li>" + "<span style=\"width: 95%; font-size:10px\">" + baseUrl + projectId + ".git</span></li>"
-                                end
-                rendered = rendered + "</ul>\n"
-                return rendered
-        end
   
-	def self.surrenderUrls(baseUrlStr, projectId, isReadOnly, parent)
+	def self.renderUrls(baseUrlStr, projectId, isReadOnly)
 		rendered = ""
 		if(baseUrlStr.length == 0)
 			return rendered
@@ -97,18 +76,18 @@ module Gitosis
 
 			Dir.mkdir local_dir
 
-			ssh_with_identity_file = File.join(local_dir, 'ssh_with_identity_file.sh')
+			# clone repo
+			`git clone #{Setting.plugin_redmine_gitosis['gitosisUrl']} #{local_dir}/gitosis`
+            ssh_with_identity_file = File.join(local_dir, 'ssh_with_identity_file.sh')
 
 			File.open(ssh_with_identity_file, "w") do |f|
 				f.puts "#!/bin/bash"
 				f.puts "exec ssh -o stricthostkeychecking=no -i #{Setting.plugin_redmine_gitosis['gitosisIdentityFile']} \"$@\""
 			end
 			File.chmod(0755, ssh_with_identity_file)
-			ENV['GIT_SSH'] = ssh_with_identity_file
 
 			# clone repo
 			`env GIT_SSH=#{ssh_with_identity_file} git clone #{Setting.plugin_redmine_gitosis['gitosisUrl']} #{local_dir}/gitosis`
-			#`git clone #{Setting.plugin_redmine_gitosis['gitosisUrl']} #{local_dir}/gitosis`
 
 			changed = false
 			projects.select{|p| p.repository.is_a?(Repository::Git)}.each do |project|
@@ -143,15 +122,6 @@ module Gitosis
 				else
 					conf["repo #{name}"]['daemon'] = 'no'
 				end
-				# Enable/disable gitweb
-				if User.anonymous.allowed_to?( :view_changesets, project )
-					conf["repo #{name}"]['gitweb'] = 'yes'
-				else
-					conf["repo #{name}"]['gitweb'] = 'no'
-				end
-
-				conf["repo #{name}"]['description'] = "#{project.name}"
-				conf["repo #{name}"]['owner'] = write_users.map{|u| u.name}.flatten.join(', ')
 
 				unless conf.eql?(original)
 					conf.write 
@@ -160,12 +130,11 @@ module Gitosis
 
 			end
 			if changed
-				git_push_file = File.join(local_dir, 'git_push.bat')
+				git_push_file = File.join(local_dir, 'git_push.sh')
 
-	      new_dir= File.join(local_dir,'gitosis')
-				# new_dir.gsub!(/\//, '\\')
+                new_dir= File.join(local_dir,'gitosis')
 				File.open(git_push_file, "w") do |f|
-					f.puts "#!/bin/sh"
+				    f.puts "#!/bin/sh"
 					f.puts "cd #{new_dir}"
 					f.puts "git add keydir/* gitosis.conf"
 					f.puts "git config user.email '#{Setting.mail_from}'"

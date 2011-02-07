@@ -3,6 +3,7 @@ require_dependency 'principal'
 require_dependency 'user'
 
 require_dependency 'gitosis'
+require_dependency 'gitosis/patches/application_controller_patch'
 require_dependency 'gitosis/patches/repositories_controller_patch'
 require_dependency 'gitosis/patches/repositories_helper_patch'
 require_dependency 'gitosis/patches/git_adapter_patch'
