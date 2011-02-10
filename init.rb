@@ -14,11 +14,11 @@ Redmine::Plugin.register :redmine_gitosis do
   description 'Enables Redmine to update a gitosis server.'
   version '0.0.5alpha'
   settings :default => {
-    'gitosisUrl' => 'git@localhost:gitosis-admin.git',
-    'gitosisIdentityFile' => '/srv/projects/redmine/miner/.ssh/id_rsa',
-    'developerBaseUrls' => 'git@www.salamander-linux.com:,https://[user]@www.salamander-linux.com/git/',
-    'readOnlyBaseUrls' => 'http://www.salamander-linux.com/git/',
-    'basePath' => '/srv/projects/git/repositories/',
+    'gitosisUrl' => 'gitosis@localhost:gitosis-admin.git',
+    'gitosisIdentityFile' => '/srv/gitosis/.ssh/id_dsa',
+    'developerBaseUrls' => 'gitosis@localhost:',
+    'readOnlyBaseUrls' => 'http://xdissent.com/git/',
+    'basePath' => '/srv/gitosis/repositories/',
     }, 
     :partial => 'redmine_gitosis'
 end
