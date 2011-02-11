@@ -1,3 +1,5 @@
+<% repo_urls = Gitosis::get_urls(@project) %>
+
 <h2><%= l(:label_repository)%></h2>
 <% html_title(l(:label_repository)) -%>
 <%# This can be used to display basic git setup instructions, like on github... %>
@@ -6,35 +8,35 @@
 <div class="box">
 
     <h3>Git setup:</h3>
-    <pre>
-        Download and install <a href="http://git-scm.com/download" target="_blank">Git</a>
-        git config --global user.name "<%= User.current %>"
-        git config --global user.email <%= User.current.mail %>
-    </pre>
+    <p>Download and install <a href="http://git-scm.com/download" target="_blank">Git</a><p>
+    <div class="pygments"><pre>git config --global user.name "<%= User.current %>"
+git config --global user.email <%= User.current.mail %></pre></div>
 
     <h3>Permission Setup:</h3>
-    <pre>
-        <%= link_to "Upload SSH public key", {:controller => "my", :action => "public_keys"} %>
-        Add yourself as a project developer: <%= link_to "#{@project.name} Settings", {:controller => "projects", :actions => "settings"} %> -&gt; Members Tab -&gt; New Member
-    </pre>
+    <p><%= link_to "Upload SSH public key", {:controller => "my", :action => "public_keys"} %></p>
+    <p>Add yourself as a project developer: <%= link_to "#{@project.name} Settings", {:controller => "projects", :actions => "settings"} %> -&gt; Members Tab -&gt; New Member</p>
 
     <h3>Repository Setup:</h3>
-    <pre>
-        mkdir <%= @project.identifier %>
-        cd <%= @project.identifier %>
-        git init
-        touch README
-        git add README
-        git commit -m "Initial commit"
-        git remote add origin <%= Setting.plugin_redmine_gitosis['developerBaseUrls'] + @project.identifier + '.git' %>
-        git push origin master
-    </pre>
+    <div class="pygments"><pre>mkdir <%= @project.identifier %>
+cd <%= @project.identifier %>
+git init
+touch README
+git add README
+git commit -m "Initial commit"
+<% repo_urls[:developer].each_with_index do |url, i| -%>
+git remote add origin <%= Setting.plugin_redmine_gitosis['developerBaseUrls'] + Gitosis.repository_name(@project) + '.git' %>
+<% if i != repo_urls[:developer].length - 1 -%>
+    or<% end -%>
+<% end -%>
+git push origin master</pre></div>
 
     <h3>Existing Git Repo?</h3>
-    <pre>
-        cd existing_git_repo
-        git remote add origin <%= Setting.plugin_redmine_gitosis['developerBaseUrls'] + @project.identifier + '.git' %>
-        git push origin master
-    </pre>    
+    <div class="pygments"><pre>cd existing_git_repo
+<% repo_urls[:developer].each_with_index do |url, i| -%>
+git remote add origin <%= Setting.plugin_redmine_gitosis['developerBaseUrls'] + Gitosis.repository_name(@project) + '.git' %>
+<% if i != repo_urls[:developer].length - 1 -%>
+    or<% end -%>
+<% end -%>
+git push origin master</pre></div>
   
 </div>
