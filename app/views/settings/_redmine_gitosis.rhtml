@@ -30,5 +30,6 @@
 		      '<option value="">(Select field)</option>' + 
 		      options_from_collection_for_select(ProjectCustomField.find_all_by_field_format('string'), :id, :name, @settings['repoNameCustomField'].to_i)) %>
 		<br />
+		<strong>Warning!</strong> Altering this field after repositories have already been created may result in undefined behaviour.
 	</p>
 </div>
