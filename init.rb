@@ -19,6 +19,7 @@ Redmine::Plugin.register :redmine_gitosis do
     'developerBaseUrls' => 'gitosis@localhost:',
     'readOnlyBaseUrls' => 'http://xdissent.com/git/',
     'basePath' => '/srv/gitosis/repositories/',
+    'repoNameCustomField' => 0
     }, 
     :partial => 'redmine_gitosis'
 end

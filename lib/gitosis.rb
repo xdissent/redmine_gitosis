@@ -5,7 +5,13 @@ module Gitosis
 
   def self.repository_name(project)
     parent_name = project.parent ? repository_name(project.parent) + "/" : ""
-    "#{parent_name}#{project.identifier}"
+    name = project.identifier
+    custom_field = Setting.plugin_redmine_gitosis['repoNameCustomField']
+    if custom_field
+      custom_name = project.custom_values.detect {|c| c.custom_field_id == custom_field}
+      name = custom_name.value unless custom_name.nil?
+    end
+    "#{parent_name}#{name}"
   end
 
   def self.get_urls(project)
