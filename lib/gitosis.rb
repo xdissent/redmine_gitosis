@@ -8,11 +8,12 @@ module Gitosis
     name = project.identifier
     custom_field = Setting.plugin_redmine_gitosis['repoNameCustomField']
     if custom_field
-      custom_name = project.custom_values.detect {|c| c.custom_field_id == custom_field}
-      name = custom_name.value unless custom_name.nil?
+      custom_name = project.custom_values.detect {|c| c.custom_field_id == custom_field.to_i}
+      name = custom_name.value unless custom_name.nil? || custom_name.value.empty?
     end
     "#{parent_name}#{name}"
   end
+
 
   def self.get_urls(project)
     urls = {:read_only => [], :developer => []}
