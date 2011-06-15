@@ -17,6 +17,7 @@ class GitosisObserver < ActiveRecord::Observer
   
   def update_repositories(object)
     case object
+      when Project then projects_need_update(object)
       when Repository then projects_need_update(object.project)
       when User then projects_need_update(object.projects) unless is_login_save?(object)
       when GitosisPublicKey then projects_need_update(object.user.projects)
