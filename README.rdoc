@@ -1,5 +1,7 @@
 = Redmine Gitosis
 
+Note: This plugin has been tested to be compatible with Chiliproject 1.x
+
 A Redmine plugin which manages your gitosis configuration based on your projects and memberships in Redmine. Includes Public Key management views (extracted from http://plan.io).
 
 This plugin was originally developed by Jan Schulz-Hofen for http://plan.io.  Several updates/fixes were provided by github users untoldwind, tingar and ericpaulbishop. These updates were merged together and expanded upon by Eric Bishop.
