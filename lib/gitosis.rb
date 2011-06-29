@@ -57,7 +57,7 @@ module Gitosis
       # Create GIT_SSH script
       ssh_with_identity_file = File.join(local_dir, 'ssh_with_identity_file.sh')
       File.open(ssh_with_identity_file, "w") do |f|
-          f.puts "#!/bin/bash"
+          f.puts "#!/bin/sh"
           f.puts "exec ssh -o stricthostkeychecking=no -i #{Setting.plugin_redmine_gitosis['gitosisIdentityFile']} \"$@\""
       end
       File.chmod(0755, ssh_with_identity_file)
