@@ -30,7 +30,7 @@ class GitosisObserver < ActiveRecord::Observer
   
   # Mark project(s) as requiring a gitosis-admin update.
   def projects_need_update(projects)
-    return if projects.nil?
+    return if projects.nil? || Thread.current[:gitosis_project_updates].nil?
     Thread.current[:gitosis_project_updates] << projects
     Thread.current[:gitosis_project_updates].flatten!
     Thread.current[:gitosis_project_updates].uniq!
