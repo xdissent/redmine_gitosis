@@ -30,10 +30,11 @@ class GitosisObserver < ActiveRecord::Observer
   
   # Mark project(s) as requiring a gitosis-admin update.
   def projects_need_update(projects)
-	Thread.current[:gitosis_project_updates] << projects
-	Thread.current[:gitosis_project_updates].flatten!
-	Thread.current[:gitosis_project_updates].uniq!
-	Thread.current[:gitosis_project_updates].compact!
+    return if projects.nil?
+    Thread.current[:gitosis_project_updates] << projects
+    Thread.current[:gitosis_project_updates].flatten!
+    Thread.current[:gitosis_project_updates].uniq!
+    Thread.current[:gitosis_project_updates].compact!
   end
 
   # Test for the fingerprint of changes to the user model when the User actually logs in.
